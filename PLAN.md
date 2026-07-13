@@ -34,12 +34,13 @@
 
 ## Phase 3 — Lists and Tasks
 
-- [ ] DTOs
-- [ ] Repositories
-- [ ] Services
-- [ ] Controllers
-- [ ] Ownership isolation
-- [ ] Unit tests
+- [x] DTOs
+- [x] Repositories
+- [x] Services
+- [x] Controllers
+- [x] Ownership isolation
+- [x] Unit tests
+- [x] E2E tests
 
 ## Phase 4 — WebSocket
 

@@ -14,4 +14,13 @@ export const ApiRoutes = {
     logout: () => buildApiPath('auth', 'logout'),
     me: () => buildApiPath('auth', 'me'),
   },
+  lists: {
+    base: () => buildApiPath('lists'),
+    byId: (listId: string) => buildApiPath('lists', listId),
+    tasks: (listId: string) => buildApiPath('lists', listId, 'tasks'),
+  },
+  tasks: {
+    byId: (taskId: string) => buildApiPath('tasks', taskId),
+    status: (taskId: string) => buildApiPath('tasks', taskId, 'status'),
+  },
 } as const;
