@@ -1,0 +1,12 @@
+name: Setup monorepo
+description: Install dependencies and generate workspace artifacts for CI
+runs:
+  using: composite
+  steps:
+    - name: Install dependencies
+      shell: bash
+      run: bun install --frozen-lockfile
+
+    - name: Generate workspace artifacts
+      shell: bash
+      run: bun run codegen

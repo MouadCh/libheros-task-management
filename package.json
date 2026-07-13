@@ -18,11 +18,12 @@
     "format": "prettier --write \"**/*.{ts,tsx,vue,js,mjs,json,md}\"",
     "format:check": "prettier --check \"**/*.{ts,tsx,vue,js,mjs,json,md}\"",
     "ci": "bun run format:check && bun run lint && bun run typecheck && bun run test && bun run test:e2e && bun run build",
+    "codegen": "bun run --filter @libheros/contracts build && bun run --filter @libheros/api prisma:generate",
     "db:up": "docker compose up -d postgres",
     "db:down": "docker compose down",
     "db:migrate": "bun run --filter @libheros/api prisma:migrate:dev",
     "db:setup": "bun run db:up && bun run --filter @libheros/api prisma:generate && bun run db:migrate",
-    "prepare": "bun run --filter @libheros/contracts build && husky"
+    "prepare": "bun run codegen && husky"
   },
   "devDependencies": {
     "@eslint/js": "^9.28.0",

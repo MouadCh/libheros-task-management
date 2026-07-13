@@ -13,6 +13,7 @@
     "test:e2e": "jest --config ./test/jest-e2e.json --runInBand",
     "test:watch": "jest --watch",
     "prisma:generate": "prisma generate",
+    "prepare": "prisma generate",
     "prisma:migrate": "prisma migrate deploy",
     "prisma:migrate:dev": "prisma migrate dev"
   },
