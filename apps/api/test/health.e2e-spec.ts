@@ -1,9 +1,10 @@
-import type { INestApplication } from '@nestjs/common';
+import { HttpStatus, type INestApplication } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { Test, type TestingModule } from '@nestjs/testing';
 import request from 'supertest';
 import type { App } from 'supertest/types';
 import { envValidationSchema } from '../src/common/config/env.validation';
+import { API_GLOBAL_PREFIX, ApiRoutes } from '../src/common/constants/api.constants';
 import { HealthModule } from '../src/health/health.module';
 import { PrismaModule } from '../src/prisma/prisma.module';
 import { PrismaService } from '../src/prisma/prisma.service';
@@ -31,7 +32,7 @@ describe('HealthController (e2e)', () => {
       .compile();
 
     app = moduleFixture.createNestApplication();
-    app.setGlobalPrefix('api');
+    app.setGlobalPrefix(API_GLOBAL_PREFIX);
     await app.init();
   });
 
@@ -39,8 +40,10 @@ describe('HealthController (e2e)', () => {
     await app?.close();
   });
 
-  it('GET /api/health returns ok when database is up', async () => {
-    const response = await request(app.getHttpServer()).get('/api/health').expect(200);
+  it(`GET ${ApiRoutes.health()} returns ok when database is up`, async () => {
+    const response = await request(app.getHttpServer())
+      .get(ApiRoutes.health())
+      .expect(HttpStatus.OK);
 
     expect(response.body.status).toBe('ok');
     expect(response.body.database).toBe('up');

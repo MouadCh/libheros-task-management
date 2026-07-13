@@ -3,6 +3,7 @@ import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import cookieParser from 'cookie-parser';
 import helmet from 'helmet';
+import { API_GLOBAL_PREFIX } from './common/constants/api.constants';
 import { AppModule } from './app.module';
 import { AppConfigService } from './common/config/app-config.service';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
@@ -11,7 +12,7 @@ async function bootstrap(): Promise<void> {
   const app = await NestFactory.create(AppModule);
   const appConfig = app.get(AppConfigService);
 
-  app.setGlobalPrefix('api');
+  app.setGlobalPrefix(API_GLOBAL_PREFIX);
   app.use(helmet());
   app.use(cookieParser());
   app.enableCors({

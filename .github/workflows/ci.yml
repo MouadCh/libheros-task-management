@@ -85,6 +85,20 @@ jobs:
 
   test-e2e:
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: libheros
+          POSTGRES_PASSWORD: libheros
+          POSTGRES_DB: libheros
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U libheros -d libheros"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 5
     steps:
       - name: Checkout
         uses: actions/checkout@v5
@@ -104,6 +118,7 @@ jobs:
           APP_HOST: localhost
           API_PORT: 3001
           WEB_PORT: 3000
+          DATABASE_URL: postgresql://libheros:libheros@localhost:5432/libheros?schema=public
           JWT_ACCESS_SECRET: ci-access-secret-32chars-min
           JWT_REFRESH_SECRET: ci-refresh-secret-32chars-min
 

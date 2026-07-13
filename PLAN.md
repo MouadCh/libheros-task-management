@@ -21,14 +21,16 @@
 
 ## Phase 2 — Authentication
 
-- [ ] Users repository
-- [ ] Sessions repository
-- [ ] Register/login
-- [ ] JWT strategies
-- [ ] Refresh rotation
-- [ ] Logout
-- [ ] Auth guard
-- [ ] Unit tests
+- [x] Users repository
+- [x] Sessions repository
+- [x] Register/login
+- [x] JWT strategies
+- [x] Refresh rotation
+- [x] Logout
+- [x] Auth guard
+- [x] Unit tests
+- [x] Auth e2e test (register, login, refresh, logout, me)
+- [x] Shared API route constants and test fixtures (no hardcoded endpoints/messages in tests)
 
 ## Phase 3 — Lists and Tasks
 
