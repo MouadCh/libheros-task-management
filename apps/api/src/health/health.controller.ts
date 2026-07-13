@@ -1,9 +1,16 @@
 import { Controller, Get } from '@nestjs/common';
+import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { HealthService, HealthStatus } from './health.service';
 
+@ApiTags('health')
 @Controller('health')
 export class HealthController {
+  constructor(private readonly healthService: HealthService) {}
+
   @Get()
-  getHealth(): { status: string } {
-    return { status: 'ok' };
+  @ApiOperation({ summary: 'Application health check' })
+  @ApiOkResponse({ description: 'Health status including database connectivity' })
+  async getHealth(): Promise<HealthStatus> {
+    return this.healthService.check();
   }
 }

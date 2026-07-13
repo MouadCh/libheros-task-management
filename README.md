@@ -31,7 +31,11 @@ packages/
 
 ```bash
 bun install
+cp .env.example .env
+bun run db:setup
 ```
+
+`db:setup` starts PostgreSQL via Docker, generates the Prisma client, and applies migrations.
 
 Run both apps:
 
@@ -58,19 +62,23 @@ The web app reads `NUXT_PUBLIC_API_BASE_URL` and `NUXT_PUBLIC_WS_URL` from the e
 
 ## Scripts
 
-| Command                | Description                      |
-| ---------------------- | -------------------------------- |
-| `bun run dev`          | Start all workspaces in dev mode |
-| `bun run dev:api`      | Start only the API               |
-| `bun run dev:web`      | Start only the web app           |
-| `bun run build`        | Build all workspaces             |
-| `bun run lint`         | Lint all workspaces              |
-| `bun run typecheck`    | Type-check all workspaces        |
-| `bun run test`         | Run unit tests                   |
-| `bun run test:e2e`     | Run API e2e tests                |
-| `bun run format`       | Format with Prettier             |
-| `bun run format:check` | Check formatting                 |
-| `bun run ci`           | Full local CI pipeline           |
+| Command                | Description                        |
+| ---------------------- | ---------------------------------- |
+| `bun run dev`          | Start all workspaces in dev mode   |
+| `bun run dev:api`      | Start only the API                 |
+| `bun run dev:web`      | Start only the web app             |
+| `bun run build`        | Build all workspaces               |
+| `bun run lint`         | Lint all workspaces                |
+| `bun run typecheck`    | Type-check all workspaces          |
+| `bun run test`         | Run unit tests                     |
+| `bun run test:e2e`     | Run API e2e tests                  |
+| `bun run format`       | Format with Prettier               |
+| `bun run format:check` | Check formatting                   |
+| `bun run ci`           | Full local CI pipeline             |
+| `bun run db:up`        | Start PostgreSQL (Docker)          |
+| `bun run db:down`      | Stop PostgreSQL                    |
+| `bun run db:migrate`   | Run Prisma migrations              |
+| `bun run db:setup`     | Start DB, generate client, migrate |
 
 ## Quality checks
 

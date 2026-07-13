@@ -1,0 +1,71 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum TaskStatus {
+  ACTIVE
+  COMPLETED
+}
+
+model User {
+  id           String        @id @default(uuid()) @db.Uuid
+  firstName    String
+  lastName     String
+  email        String        @unique
+  passwordHash String
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  taskLists    TaskList[]
+  authSessions AuthSession[]
+}
+
+model AuthSession {
+  id               String    @id @default(uuid()) @db.Uuid
+  userId           String    @db.Uuid
+  refreshTokenHash String
+  expiresAt        DateTime
+  revokedAt        DateTime?
+  userAgent        String?
+  ipAddress        String?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+  user             User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, revokedAt, expiresAt])
+}
+
+model TaskList {
+  id             String   @id @default(uuid()) @db.Uuid
+  userId         String   @db.Uuid
+  name           String
+  normalizedName String
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tasks          Task[]
+
+  @@unique([userId, normalizedName])
+  @@index([userId])
+}
+
+model Task {
+  id               String     @id @default(uuid()) @db.Uuid
+  listId           String     @db.Uuid
+  shortDescription String
+  longDescription  String?
+  dueDate          DateTime
+  status           TaskStatus @default(ACTIVE)
+  completedAt      DateTime?
+  createdAt        DateTime   @default(now())
+  updatedAt        DateTime   @updatedAt
+  list             TaskList   @relation(fields: [listId], references: [id], onDelete: Cascade)
+
+  @@index([listId])
+  @@index([status])
+  @@index([dueDate])
+}

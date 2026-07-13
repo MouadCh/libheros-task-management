@@ -11,13 +11,13 @@
 
 ## Phase 1 — Database and Backend Foundations
 
-- [ ] Prisma schema and migration
-- [ ] Config validation
-- [ ] Global validation
-- [ ] Error filter
-- [ ] Swagger
-- [ ] Health endpoint
-- [ ] Base repository structure
+- [x] Prisma schema and migration
+- [x] Config validation
+- [x] Global validation
+- [x] Error filter
+- [x] Swagger
+- [x] Health endpoint
+- [x] Base repository structure
 
 ## Phase 2 — Authentication
 
