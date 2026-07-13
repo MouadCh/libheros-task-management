@@ -22,7 +22,7 @@
     "db:down": "docker compose down",
     "db:migrate": "bun run --filter @libheros/api prisma:migrate:dev",
     "db:setup": "bun run db:up && bun run --filter @libheros/api prisma:generate && bun run db:migrate",
-    "prepare": "husky"
+    "prepare": "bun run --filter @libheros/contracts build && husky"
   },
   "devDependencies": {
     "@eslint/js": "^9.28.0",

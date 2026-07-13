@@ -11,7 +11,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  quality:
+  format:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -28,17 +28,95 @@ jobs:
       - name: Check formatting
         run: bun run format:check
 
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.2.0
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
       - name: Lint
         run: bun run lint
+
+  typecheck:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.2.0
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
 
       - name: Typecheck
         run: bun run typecheck
 
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.2.0
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
       - name: Unit tests
         run: bun run test
 
+  test-e2e:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.2.0
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
       - name: E2E tests
         run: bun run test:e2e
+        env:
+          NODE_ENV: test
+          APP_HOST: localhost
+          API_PORT: 3001
+          WEB_PORT: 3000
+          DATABASE_URL: postgresql://libheros:libheros@localhost:5432/libheros?schema=public
+          JWT_ACCESS_SECRET: ci-access-secret-32chars-min
+          JWT_REFRESH_SECRET: ci-refresh-secret-32chars-min
+
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.2.0
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
 
       - name: Build
         run: bun run build
