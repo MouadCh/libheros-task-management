@@ -1,0 +1,35 @@
+{
+  "name": "libheros-task-management",
+  "private": true,
+  "packageManager": "bun@1.2.0",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "bun run --filter '*' dev",
+    "dev:api": "bun run --filter @libheros/api dev",
+    "dev:web": "bun run --filter @libheros/web dev",
+    "build": "bun run --filter '*' build",
+    "lint": "bun run --filter '*' lint",
+    "typecheck": "bun run --filter '*' typecheck",
+    "test": "bun run --filter '*' test",
+    "test:e2e": "bun run --filter '*' test:e2e",
+    "format": "prettier --write \"**/*.{ts,tsx,vue,js,mjs,json,md}\"",
+    "format:check": "prettier --check \"**/*.{ts,tsx,vue,js,mjs,json,md}\"",
+    "ci": "bun run format:check && bun run lint && bun run typecheck && bun run test && bun run test:e2e && bun run build",
+    "prepare": "husky"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.28.0",
+    "eslint": "^9.28.0",
+    "eslint-config-prettier": "^10.1.5",
+    "eslint-plugin-vue": "^10.2.0",
+    "globals": "^16.2.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^17.0.8",
+    "prettier": "^3.5.3",
+    "typescript": "^5.8.3",
+    "typescript-eslint": "^8.34.0"
+  }
+}
