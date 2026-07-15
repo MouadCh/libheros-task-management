@@ -81,10 +81,10 @@
 
 ## Phase 8 — Testing
 
-- [ ] Required unit tests
-- [ ] Full e2e test
-- [ ] Cross-user isolation test
-- [ ] Run and fix all test commands
+- [x] Required unit tests
+- [x] Full e2e test
+- [x] Cross-user isolation test
+- [x] Run and fix all test commands
 
 ## Phase 9 — Delivery
 
