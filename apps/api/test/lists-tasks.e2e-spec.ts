@@ -10,6 +10,7 @@ import {
 } from '../src/lists/constants/lists.constants';
 import { PrismaService } from '../src/prisma/prisma.service';
 import { TASK_NOT_FOUND_MESSAGE } from '../src/tasks/constants/tasks.constants';
+import { unknownListId } from '../src/testing/constants/e2e-resource.constants';
 import {
   buildBearerAuthorization,
   buildRegisterPayload,
@@ -127,7 +128,7 @@ describe('Lists and Tasks (e2e)', () => {
     const auth = buildBearerAuthorization(accessToken);
 
     const response = await request(app.getHttpServer())
-      .delete(ApiRoutes.lists.byId('00000000-0000-4000-8000-000000000001'))
+      .delete(ApiRoutes.lists.byId(unknownListId))
       .set(auth)
       .expect(HttpStatus.NOT_FOUND);
 

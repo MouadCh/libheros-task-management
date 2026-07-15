@@ -1,22 +1,37 @@
 import { Injectable } from '@nestjs/common';
 import type { TaskDto, TaskListDto, TaskStatus } from '@libheros/contracts';
+import { RealtimeGateway } from './realtime.gateway';
 
 @Injectable()
 export class RealtimePublisher {
-  emitTaskCreated(_listId: string, _task: TaskDto): void {}
+  constructor(private readonly realtimeGateway: RealtimeGateway) {}
 
-  emitTaskUpdated(_listId: string, _task: TaskDto): void {}
+  emitTaskCreated(listId: string, task: TaskDto): void {
+    this.realtimeGateway.emitTaskCreated(listId, task);
+  }
 
-  emitTaskDeleted(_listId: string, _taskId: string): void {}
+  emitTaskUpdated(listId: string, task: TaskDto): void {
+    this.realtimeGateway.emitTaskUpdated(listId, task);
+  }
+
+  emitTaskDeleted(listId: string, taskId: string): void {
+    this.realtimeGateway.emitTaskDeleted(listId, taskId);
+  }
 
   emitTaskCompleted(
-    _listId: string,
-    _taskId: string,
-    _status: TaskStatus,
-    _completedAt: string | null,
-  ): void {}
+    listId: string,
+    taskId: string,
+    status: TaskStatus,
+    completedAt: string | null,
+  ): void {
+    this.realtimeGateway.emitTaskCompleted(listId, taskId, status, completedAt);
+  }
 
-  emitListCreated(_userId: string, _list: TaskListDto): void {}
+  emitListCreated(userId: string, list: TaskListDto): void {
+    this.realtimeGateway.emitListCreated(userId, list);
+  }
 
-  emitListDeleted(_userId: string, _listId: string): void {}
+  emitListDeleted(userId: string, listId: string): void {
+    this.realtimeGateway.emitListDeleted(userId, listId);
+  }
 }

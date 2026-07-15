@@ -44,12 +44,13 @@
 
 ## Phase 4 — WebSocket
 
-- [ ] Authenticated gateway
-- [ ] Rooms
-- [ ] Typed events
-- [ ] Service-to-gateway event publisher
-- [ ] Cleanup
-- [ ] Tests where practical
+- [x] Authenticated gateway
+- [x] Rooms
+- [x] Typed events
+- [x] Service-to-gateway event publisher
+- [x] Cleanup
+- [x] Tests where practical
+- [x] E2E tests
 
 ## Phase 5 — Nuxt Authentication
 

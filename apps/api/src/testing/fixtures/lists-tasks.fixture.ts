@@ -1,3 +1,4 @@
+import type { UpdateTaskDto } from '../../tasks/dto/update-task.dto';
 import type { CreateListDto } from '../../lists/dto/create-list.dto';
 import type { RegisterDto } from '../../auth/dto/register.dto';
 import type { CreateTaskDto } from '../../tasks/dto/create-task.dto';
@@ -32,6 +33,13 @@ export function buildCreateTaskPayload(overrides: Partial<CreateTaskDto> = {}): 
   return {
     shortDescription: listsTestData.taskShortDescription,
     dueDate: listsTestData.taskDueDate,
+    ...overrides,
+  };
+}
+
+export function buildUpdateTaskPayload(overrides: Partial<UpdateTaskDto> = {}): UpdateTaskDto {
+  return {
+    shortDescription: listsTestData.updatedShortDescription,
     ...overrides,
   };
 }
