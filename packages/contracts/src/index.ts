@@ -3,14 +3,7 @@ export enum TaskStatus {
   COMPLETED = 'COMPLETED',
 }
 
-export interface UserDto {
-  id: string;
-  firstName: string;
-  lastName: string;
-  email: string;
-  createdAt: string;
-  updatedAt: string;
-}
+export type { UserDto } from './user';
 
 export interface TaskListDto {
   id: string;
@@ -97,6 +90,10 @@ export interface ApiErrorResponse {
   path: string;
   requestId: string;
 }
+
+export { ErrorCodes, type ErrorCode } from './error-codes';
+
+export type { AuthResponse, LoginPayload, RefreshResponse, RegisterPayload } from './auth';
 
 export {
   buildAppUrl,

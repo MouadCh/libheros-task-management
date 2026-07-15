@@ -54,11 +54,12 @@
 
 ## Phase 5 — Nuxt Authentication
 
-- [ ] Pinia auth store
-- [ ] API client
-- [ ] Single-flight refresh
-- [ ] Middleware
-- [ ] Login/register UI
+- [x] Pinia auth store
+- [x] API client
+- [x] Single-flight refresh
+- [x] Middleware
+- [x] Login/register UI
+- [x] Session restore error UX + auth client unit tests
 
 ## Phase 6 — Main Task Interface
 

@@ -7,6 +7,7 @@ export default [
     rules: {
       'vue/multi-word-component-names': 'off',
       'vue/singleline-html-element-content-newline': 'off',
+      'vue/max-attributes-per-line': 'off',
     },
     languageOptions: {
       globals: {
@@ -19,6 +20,17 @@ export default [
         useNuxtApp: 'readonly',
         navigateTo: 'readonly',
         $fetch: 'readonly',
+        useAuthStore: 'readonly',
+        useApiClient: 'readonly',
+        useRealtime: 'readonly',
+        ref: 'readonly',
+        computed: 'readonly',
+        reactive: 'readonly',
+        watch: 'readonly',
+        onMounted: 'readonly',
+        nextTick: 'readonly',
+        useRoute: 'readonly',
+        useRouter: 'readonly',
       },
     },
   },

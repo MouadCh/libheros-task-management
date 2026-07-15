@@ -14,6 +14,24 @@ const nuxtGlobals = {
   useNuxtApp: 'readonly',
   navigateTo: 'readonly',
   $fetch: 'readonly',
+  useRoute: 'readonly',
+  useRouter: 'readonly',
+  useAuthStore: 'readonly',
+  useApiClient: 'readonly',
+  useRealtime: 'readonly',
+  // Vue Composition API (Nuxt auto-imports)
+  ref: 'readonly',
+  computed: 'readonly',
+  reactive: 'readonly',
+  watch: 'readonly',
+  watchEffect: 'readonly',
+  onMounted: 'readonly',
+  onBeforeUnmount: 'readonly',
+  nextTick: 'readonly',
+  toRef: 'readonly',
+  toRefs: 'readonly',
+  unref: 'readonly',
+  shallowRef: 'readonly',
 };
 
 export default tseslint.config(
