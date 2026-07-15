@@ -3,6 +3,15 @@ description: Install dependencies and generate workspace artifacts for CI
 runs:
   using: composite
   steps:
+    - name: Cache Bun install
+      uses: actions/cache@v4
+      with:
+        path: ~/.bun/install/cache
+        key: bun-1.2.0-${{ runner.os }}-${{ hashFiles('bun.lock') }}
+        restore-keys: |
+          bun-1.2.0-${{ runner.os }}-
+          bun-${{ runner.os }}-
+
     - name: Install dependencies
       shell: bash
       run: bun install --frozen-lockfile

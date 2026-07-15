@@ -88,12 +88,12 @@
 
 ## Phase 9 — Delivery
 
-- [ ] Dockerfiles
-- [ ] docker-compose.yml
-- [ ] .env.example
-- [ ] GitHub Actions
-- [ ] README
-- [ ] CI badge placeholder
+- [x] Dockerfiles
+- [x] docker-compose.yml
+- [x] .env.example
+- [x] GitHub Actions
+- [x] README
+- [x] CI badge placeholder
 
 ## Phase 10 — Final Verification
 
