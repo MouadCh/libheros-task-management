@@ -1,13 +1,35 @@
 /**
  * Realtime socket lifecycle hooks.
- * Phase 7 will wire Socket.IO connect/disconnect here.
+ * Client singleton lives in utils/realtime-client.ts.
  */
+import {
+  connectRealtime,
+  disconnectRealtime,
+  syncRealtimeAccessToken,
+  syncRealtimeListRoom,
+} from '../utils/realtime-client';
+
 export function useRealtime() {
+  function connect(): void {
+    connectRealtime();
+  }
+
   function disconnect(): void {
-    // No-op until Phase 7 WebSocket client ships.
+    disconnectRealtime();
+  }
+
+  function syncListRoom(listId: string | null): void {
+    syncRealtimeListRoom(listId);
+  }
+
+  function syncAccessToken(): void {
+    syncRealtimeAccessToken();
   }
 
   return {
+    connect,
     disconnect,
+    syncListRoom,
+    syncAccessToken,
   };
 }

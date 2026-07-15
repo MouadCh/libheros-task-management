@@ -73,11 +73,11 @@
 
 ## Phase 7 — Realtime Frontend
 
-- [ ] Socket client
-- [ ] Room lifecycle
-- [ ] Pinia event handlers
-- [ ] Multi-tab synchronization
-- [ ] Reconnection behavior
+- [x] Socket client
+- [x] Room lifecycle
+- [x] Pinia event handlers
+- [x] Multi-tab synchronization
+- [x] Reconnection behavior
 
 ## Phase 8 — Testing
 

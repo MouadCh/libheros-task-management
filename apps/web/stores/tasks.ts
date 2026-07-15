@@ -1,6 +1,12 @@
 import { defineStore } from 'pinia';
 import { computed, ref } from 'vue';
-import type { TaskDto } from '@libheros/contracts';
+import type {
+  TaskCompletedPayload,
+  TaskCreatedPayload,
+  TaskDeletedPayload,
+  TaskDto,
+  TaskUpdatedPayload,
+} from '@libheros/contracts';
 import { useApiClient } from '../composables/useApiClient';
 import { LISTS_TASKS_UI_MESSAGES } from '../constants/lists-tasks.constants';
 import type { CreateTaskPayload, UpdateTaskPayload } from '../types/lists-tasks';
@@ -54,12 +60,22 @@ export const useTasksStore = defineStore('tasks', () => {
     isLoading.value = false;
   }
 
-  async function fetchTasks(nextListId: string): Promise<void> {
+  async function fetchTasks(
+    nextListId: string,
+    options: { preserveSelection?: boolean; silent?: boolean } = {},
+  ): Promise<void> {
     const generation = fetchGeneration.value + 1;
     fetchGeneration.value = generation;
     listId.value = nextListId;
-    selectedTaskId.value = null;
-    isLoading.value = true;
+
+    const previousSelectedId = selectedTaskId.value;
+    if (!options.preserveSelection) {
+      selectedTaskId.value = null;
+    }
+
+    if (!options.silent) {
+      isLoading.value = true;
+    }
     error.value = null;
 
     try {
@@ -71,6 +87,11 @@ export const useTasksStore = defineStore('tasks', () => {
       }
 
       tasks.value = sortTaskDtos(result);
+
+      if (options.preserveSelection && previousSelectedId) {
+        const stillPresent = result.some((task) => task.id === previousSelectedId);
+        selectedTaskId.value = stillPresent ? previousSelectedId : null;
+      }
     } catch (err) {
       if (generation !== fetchGeneration.value) {
         return;
@@ -149,16 +170,61 @@ export const useTasksStore = defineStore('tasks', () => {
     try {
       const api = useApiClient();
       await api.deleteTask(taskId);
-      tasks.value = tasks.value.filter((task) => task.id !== taskId);
-      if (selectedTaskId.value === taskId) {
-        selectedTaskId.value = null;
-      }
+      applyTaskDeletedLocal(taskId);
     } catch (err) {
       error.value = getApiErrorMessage(err, LISTS_TASKS_UI_MESSAGES.deleteTaskFailed);
       throw err;
     } finally {
       isMutating.value = false;
     }
+  }
+
+  function applyTaskDeletedLocal(taskId: string): void {
+    tasks.value = tasks.value.filter((task) => task.id !== taskId);
+    if (selectedTaskId.value === taskId) {
+      selectedTaskId.value = null;
+    }
+  }
+
+  function applyTaskCreated(payload: TaskCreatedPayload): void {
+    if (payload.listId !== listId.value) {
+      return;
+    }
+
+    upsertTask(payload.task);
+  }
+
+  function applyTaskUpdated(payload: TaskUpdatedPayload): void {
+    if (payload.listId !== listId.value) {
+      return;
+    }
+
+    upsertTask(payload.task);
+  }
+
+  function applyTaskDeleted(payload: TaskDeletedPayload): void {
+    if (payload.listId !== listId.value) {
+      return;
+    }
+
+    applyTaskDeletedLocal(payload.taskId);
+  }
+
+  function applyTaskCompleted(payload: TaskCompletedPayload): void {
+    if (payload.listId !== listId.value) {
+      return;
+    }
+
+    const existing = tasks.value.find((task) => task.id === payload.taskId);
+    if (!existing) {
+      return;
+    }
+
+    upsertTask({
+      ...existing,
+      status: payload.status,
+      completedAt: payload.completedAt,
+    });
   }
 
   return {
@@ -181,5 +247,9 @@ export const useTasksStore = defineStore('tasks', () => {
     updateTask,
     setTaskCompleted,
     deleteTask,
+    applyTaskCreated,
+    applyTaskUpdated,
+    applyTaskDeleted,
+    applyTaskCompleted,
   };
 });

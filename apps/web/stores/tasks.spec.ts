@@ -65,4 +65,42 @@ describe('useTasksStore fetch race', () => {
     expect(store.tasks.map((task) => task.id)).toEqual(['task-b']);
     expect(store.isLoading).toBe(false);
   });
+
+  it('clears loading when a silent fetch wins over an in-flight visible fetch', async () => {
+    const { useTasksStore } = await import('./tasks');
+    const store = useTasksStore();
+
+    let resolveVisible!: (value: TaskDto[]) => void;
+    let resolveSilent!: (value: TaskDto[]) => void;
+
+    mockApi.listTasks
+      .mockImplementationOnce(
+        () =>
+          new Promise<TaskDto[]>((resolve) => {
+            resolveVisible = resolve;
+          }),
+      )
+      .mockImplementationOnce(
+        () =>
+          new Promise<TaskDto[]>((resolve) => {
+            resolveSilent = resolve;
+          }),
+      );
+
+    const visible = store.fetchTasks('list-a');
+    expect(store.isLoading).toBe(true);
+
+    const silent = store.fetchTasks('list-a', { silent: true, preserveSelection: true });
+
+    resolveSilent([makeTask('task-a', 'list-a')]);
+    await silent;
+
+    expect(store.isLoading).toBe(false);
+
+    resolveVisible([makeTask('task-stale', 'list-a')]);
+    await visible;
+
+    expect(store.tasks.map((task) => task.id)).toEqual(['task-a']);
+    expect(store.isLoading).toBe(false);
+  });
 });

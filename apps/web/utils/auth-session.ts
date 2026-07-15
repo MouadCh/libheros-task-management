@@ -7,7 +7,8 @@ import type { UserDto } from '@libheros/contracts';
  *
  * Multi-tab note: refresh tokens rotate server-side (single-use). Concurrent
  * refresh/bootstrap across tabs can revoke one tab's cookie. Coordinate via
- * BroadcastChannel in a later phase if multi-tab UX becomes critical.
+ * BroadcastChannel if multi-tab auth UX becomes critical. List/task sync across
+ * tabs uses Socket.IO rooms (each tab connects independently) — not this module.
  */
 export const accessToken: Ref<string | null> = ref(null);
 export const user: Ref<UserDto | null> = ref(null);

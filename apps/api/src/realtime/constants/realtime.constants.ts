@@ -1,4 +1,4 @@
-export const WS_AUTH_TOKEN_KEY = 'token';
+export { WS_AUTH_TOKEN_KEY } from '@libheros/contracts';
 
 export const WS_ACK_SUCCESS_RESPONSE = { success: true } as const;
 

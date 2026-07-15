@@ -26,6 +26,9 @@ export interface TaskDto {
   updatedAt: string;
 }
 
+/** Handshake `socket.handshake.auth` key for the JWT access token. */
+export const WS_AUTH_TOKEN_KEY = 'token' as const;
+
 export const WS_CLIENT_EVENTS = {
   LIST_JOIN: 'list:join',
   LIST_LEAVE: 'list:leave',
