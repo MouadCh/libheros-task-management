@@ -19,6 +19,8 @@ const nuxtGlobals = {
   useAuthStore: 'readonly',
   useApiClient: 'readonly',
   useRealtime: 'readonly',
+  useListsStore: 'readonly',
+  useTasksStore: 'readonly',
   // Vue Composition API (Nuxt auto-imports)
   ref: 'readonly',
   computed: 'readonly',

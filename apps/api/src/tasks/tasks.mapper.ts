@@ -1,4 +1,4 @@
-import type { TaskStatus, TaskDto } from '@libheros/contracts';
+import type { TaskDto } from '@libheros/contracts';
 import type { Task } from '@prisma/client';
 
 export function toTaskDto(task: Task): TaskDto {
@@ -8,7 +8,7 @@ export function toTaskDto(task: Task): TaskDto {
     shortDescription: task.shortDescription,
     longDescription: task.longDescription,
     dueDate: task.dueDate.toISOString(),
-    status: task.status as TaskStatus,
+    status: task.status,
     completedAt: task.completedAt?.toISOString() ?? null,
     createdAt: task.createdAt.toISOString(),
     updatedAt: task.updatedAt.toISOString(),

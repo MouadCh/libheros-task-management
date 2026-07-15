@@ -1,7 +1,9 @@
-export enum TaskStatus {
-  ACTIVE = 'ACTIVE',
-  COMPLETED = 'COMPLETED',
-}
+export const TaskStatus = {
+  ACTIVE: 'ACTIVE',
+  COMPLETED: 'COMPLETED',
+} as const;
+
+export type TaskStatus = (typeof TaskStatus)[keyof typeof TaskStatus];
 
 export type { UserDto } from './user';
 

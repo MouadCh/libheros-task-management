@@ -63,13 +63,13 @@
 
 ## Phase 6 — Main Task Interface
 
-- [ ] Three-column layout
-- [ ] Left sidebar
-- [ ] Task form and lists
-- [ ] Completed section
-- [ ] Right detail sidebar
-- [ ] Confirmation modals
-- [ ] Responsive and accessible UI
+- [x] Three-column layout
+- [x] Left sidebar
+- [x] Task form and lists
+- [x] Completed section
+- [x] Right detail sidebar
+- [x] Confirmation modals
+- [x] Responsive and accessible UI
 
 ## Phase 7 — Realtime Frontend
 

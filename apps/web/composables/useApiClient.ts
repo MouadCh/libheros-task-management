@@ -3,10 +3,18 @@ import type {
   LoginPayload,
   RefreshResponse,
   RegisterPayload,
+  TaskDto,
+  TaskListDto,
   UserDto,
 } from '@libheros/contracts';
-import { AuthApiRoutes } from '../constants/api.routes';
+import { AuthApiRoutes, ListsApiRoutes, TasksApiRoutes } from '../constants/api.routes';
 import { AUTH_REQUEST_TIMEOUT_MS } from '../constants/auth.constants';
+import type {
+  CreateListPayload,
+  CreateTaskPayload,
+  UpdateTaskPayload,
+  UpdateTaskStatusPayload,
+} from '../types/lists-tasks';
 import { shouldRefreshAndRetry } from '../utils/auth-retry';
 import { getAccessToken, refreshAccessToken } from '../utils/auth-session';
 
@@ -118,6 +126,58 @@ export function useApiClient() {
     });
   }
 
+  function listLists(): Promise<TaskListDto[]> {
+    return apiFetch<TaskListDto[]>(ListsApiRoutes.base, { method: 'GET' });
+  }
+
+  function createList(payload: CreateListPayload): Promise<TaskListDto> {
+    return apiFetch<TaskListDto>(ListsApiRoutes.base, {
+      method: 'POST',
+      body: payload,
+    });
+  }
+
+  function deleteList(listId: string): Promise<{ success: true }> {
+    return apiFetch<{ success: true }>(ListsApiRoutes.byId(listId), {
+      method: 'DELETE',
+    });
+  }
+
+  function listTasks(listId: string): Promise<TaskDto[]> {
+    return apiFetch<TaskDto[]>(ListsApiRoutes.tasks(listId), { method: 'GET' });
+  }
+
+  function createTask(listId: string, payload: CreateTaskPayload): Promise<TaskDto> {
+    return apiFetch<TaskDto>(ListsApiRoutes.tasks(listId), {
+      method: 'POST',
+      body: payload,
+    });
+  }
+
+  function getTask(taskId: string): Promise<TaskDto> {
+    return apiFetch<TaskDto>(TasksApiRoutes.byId(taskId), { method: 'GET' });
+  }
+
+  function updateTask(taskId: string, payload: UpdateTaskPayload): Promise<TaskDto> {
+    return apiFetch<TaskDto>(TasksApiRoutes.byId(taskId), {
+      method: 'PATCH',
+      body: payload,
+    });
+  }
+
+  function updateTaskStatus(taskId: string, payload: UpdateTaskStatusPayload): Promise<TaskDto> {
+    return apiFetch<TaskDto>(TasksApiRoutes.status(taskId), {
+      method: 'PATCH',
+      body: payload,
+    });
+  }
+
+  function deleteTask(taskId: string): Promise<{ success: true }> {
+    return apiFetch<{ success: true }>(TasksApiRoutes.byId(taskId), {
+      method: 'DELETE',
+    });
+  }
+
   return {
     apiFetch,
     register,
@@ -125,5 +185,14 @@ export function useApiClient() {
     refresh,
     logout,
     me,
+    listLists,
+    createList,
+    deleteList,
+    listTasks,
+    createTask,
+    getTask,
+    updateTask,
+    updateTaskStatus,
+    deleteTask,
   };
 }
