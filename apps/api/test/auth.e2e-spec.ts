@@ -1,8 +1,11 @@
 import { HttpStatus, type INestApplication } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
 import request from 'supertest';
 import type { App } from 'supertest/types';
 import { AUTH_INVALID_CREDENTIALS_MESSAGE } from '../src/auth/constants/auth.constants';
+import { REFRESH_TOKEN_COOKIE } from '../src/auth/utils/auth-cookie.util';
 import { ApiRoutes } from '../src/common/constants/api.constants';
+import { AppConfigService } from '../src/common/config/app-config.service';
 import { ErrorCodes } from '../src/common/exceptions/error-codes';
 import { PrismaService } from '../src/prisma/prisma.service';
 import {
@@ -14,7 +17,6 @@ import {
 import { createE2eApp } from './utils/create-e2e-app';
 import { getRefreshCookieValue, normalizeSetCookieHeader } from './utils/cookie.util';
 import { ensureDatabaseReady, resetDatabase } from './utils/database';
-import { REFRESH_TOKEN_COOKIE } from '../src/auth/utils/auth-cookie.util';
 
 describe('AuthController (e2e)', () => {
   let app: INestApplication<App>;
@@ -135,6 +137,65 @@ describe('AuthController (e2e)', () => {
     const refreshCookieAfter = getRefreshCookieValue(refreshResponse.headers['set-cookie']);
     expect(refreshCookieAfter).toBeDefined();
     expect(refreshCookieAfter).not.toBe(refreshCookieBefore);
+  });
+
+  it('rejects refresh-token reuse after rotation and revokes the session', async () => {
+    const agent = request.agent(app.getHttpServer());
+
+    const registerResponse = await agent
+      .post(ApiRoutes.auth.register())
+      .send(registerPayload)
+      .expect(HttpStatus.CREATED);
+    const previousRefresh = getRefreshCookieValue(registerResponse.headers['set-cookie']);
+    expect(previousRefresh).toBeDefined();
+
+    const refreshResponse = await agent.post(ApiRoutes.auth.refresh()).expect(HttpStatus.CREATED);
+    const rotatedRefresh = getRefreshCookieValue(refreshResponse.headers['set-cookie']);
+    expect(rotatedRefresh).toBeDefined();
+    expect(rotatedRefresh).not.toBe(previousRefresh);
+
+    const reuseResponse = await request(app.getHttpServer())
+      .post(ApiRoutes.auth.refresh())
+      .set('Cookie', `${REFRESH_TOKEN_COOKIE}=${previousRefresh}`)
+      .expect(HttpStatus.UNAUTHORIZED);
+
+    expect(reuseResponse.body.code).toBe(ErrorCodes.AUTH_INVALID_TOKEN);
+
+    // Reuse detection revokes the session — the rotated cookie must also stop working.
+    const afterReuse = await request(app.getHttpServer())
+      .post(ApiRoutes.auth.refresh())
+      .set('Cookie', `${REFRESH_TOKEN_COOKIE}=${rotatedRefresh}`)
+      .expect(HttpStatus.UNAUTHORIZED);
+
+    expect(afterReuse.body.code).toBe(ErrorCodes.AUTH_INVALID_TOKEN);
+  });
+
+  it('returns AUTH_ACCESS_TOKEN_EXPIRED for an expired access JWT', async () => {
+    const agent = request.agent(app.getHttpServer());
+    const jwtService = app.get(JwtService);
+    const appConfig = app.get(AppConfigService);
+
+    const registerResponse = await agent
+      .post(ApiRoutes.auth.register())
+      .send(registerPayload)
+      .expect(HttpStatus.CREATED);
+
+    const userId = registerResponse.body.user.id as string;
+    const expiredAccessToken = await jwtService.signAsync(
+      { sub: userId },
+      {
+        secret: appConfig.jwtAccessSecret,
+        expiresIn: '-1h',
+      },
+    );
+
+    const expiredResponse = await request(app.getHttpServer())
+      .get(ApiRoutes.auth.me())
+      .set(buildBearerAuthorization(expiredAccessToken))
+      .expect(HttpStatus.UNAUTHORIZED);
+
+    expect(expiredResponse.body.code).toBe(ErrorCodes.AUTH_ACCESS_TOKEN_EXPIRED);
+    expect(expiredResponse.body.message).toBe('Access token has expired');
   });
 
   it('logs out, clears refresh session, and rejects subsequent refresh', async () => {

@@ -12,7 +12,11 @@
 
 > Full-stack collaborative task manager built as a Bun monorepo — NestJS API, Nuxt 3 SPA, Prisma + PostgreSQL, and authenticated Socket.IO rooms.
 
-**Author:** [Mouad Chafai](https://github.com/MouadCh) · **Repo:** [libheros-task-management](https://github.com/MouadCh/libheros-task-management)
+**Author:** [MouadC](https://github.com/MouadCh) · **Repo:** [libheros-task-management](https://github.com/MouadCh/libheros-task-management)
+
+<p align="center">
+  <img src="docs/screenshots/auth-signin.png" alt="libheros Tasks sign-in screen" width="900" />
+</p>
 
 ---
 
@@ -33,7 +37,8 @@
 - [Scripts](#scripts)
 - [Quality & CI](#quality--ci)
 - [Trade-offs](#trade-offs)
-- [With more time](#with-more-time)
+- [Nice to have (scaling)](#nice-to-have-scaling)
+- [Contributing](#contributing)
 - [Status](#status)
 
 ---
@@ -215,7 +220,7 @@ sequenceDiagram
 4. **Logout** — revoke session and clear cookie.
 5. **WebSocket** — `socket.handshake.auth.token` (`WS_AUTH_TOKEN_KEY`); unauthenticated sockets are rejected; join checks list ownership.
 
-On the web client, the access token lives **in memory** (Pinia / session ref) — not `localStorage`.
+On the web client, the access token lives **in memory** (Pinia / session ref) — not `localStorage`. Expired access tokens return `AUTH_ACCESS_TOKEN_EXPIRED`; the Nuxt API client refreshes once and retries (see `shouldRefreshAndRetry`). Auth e2e covers refresh rotation, **reuse detection**, and the expired-access `401` code.
 
 ---
 
@@ -295,6 +300,7 @@ Test commands (Bun workspaces; equivalent to the brief’s `npm run test` / `npm
 ```bash
 bun run test
 bun run test:e2e
+bun run test:e2e:web   # Playwright smoke (needs Postgres; starts API + Nuxt)
 ```
 
 | Command                           | Description                         |
@@ -307,6 +313,7 @@ bun run test:e2e
 | `bun run build`                   | Build all workspaces                |
 | `bun run lint` / `typecheck`      | Static checks                       |
 | `bun run test` / `test:e2e`       | Unit + API e2e                      |
+| `bun run test:e2e:web`            | Playwright workspace smoke          |
 | `bun run format` / `format:check` | Prettier                            |
 | `bun run ci`                      | Full local CI pipeline              |
 | `bun run db:up`                   | Postgres only                       |
@@ -345,24 +352,25 @@ bun run ci
 
 ---
 
-## With more time
+## Nice to have (scaling)
 
-- Redis adapter + sticky sessions for Socket.IO
-- Multi-user list sharing beyond owner-only rooms
-- OpenAPI-generated web client
-- Metrics, tracing, correlation IDs end-to-end
-- Strict prod secret gating / rotation; TLS + `COOKIE_SECURE=true`
-- Broader frontend unit & e2e coverage
-- Frozen lockfile for Docker production dependency stage
-- Atomic refresh rotation in the DB (compare-and-swap) under concurrent API replicas
+Ideas that would matter if this moved past a tech-test into a multi-node product:
+
+| Area                 | Direction                                                                                           |
+| -------------------- | --------------------------------------------------------------------------------------------------- |
+| **Realtime scale**   | Redis Socket.IO adapter + sticky sessions for horizontal fan-out                                    |
+| **Auth concurrency** | Atomic refresh rotation in Postgres (compare-and-swap / `FOR UPDATE`) under concurrent API replicas |
+| **Observability**    | Structured audit logs (who/what/when), metrics, tracing, and end-to-end correlation IDs             |
+| **Browser e2e**      | Playwright smoke: login → list → task → complete → multi-client realtime sync                       |
+| **API client**       | OpenAPI-generated typed web client from Swagger                                                     |
+| **Product**          | Multi-user list sharing beyond owner-only rooms                                                     |
+| **Delivery**         | Frozen lockfile in Docker prod-deps stage; TLS + `COOKIE_SECURE=true` in shared environments        |
 
 ### Testing priorities with more time
 
-1. **Auth e2e** — refresh-token reuse after rotation; expired access JWT → `AUTH_ACCESS_TOKEN_EXPIRED` + client retry
-2. **ListsService unit tests** — normalize/conflict/delete + emit order
-3. **Web** — lists store + Playwright smoke (login → list → task → complete → multi-tab sync)
-4. **Validation negatives** — empty names, bad due dates, throttle responses
-5. **Docker CI job** — `compose config` + image build on PR
+1. **ListsService unit tests** — normalize/conflict/delete + emit order
+2. **Validation negatives** — empty names, bad due dates, throttle responses
+3. **Playwright** — workspace + multi-tab sync beyond API e2e
 
 ### Git history note
 
@@ -370,16 +378,39 @@ Delivery was iterated as **sequential phase commits on `main`** (scaffold → au
 
 ---
 
+## Contributing
+
+Contributions are welcome. A good default loop:
+
+1. Fork the repo and create a branch from `main` (`feature/…` or `fix/…`).
+2. Copy `.env.example` → `.env`, then `bun install` and `bun run db:setup`.
+3. Make a focused change; keep diffs small and match existing module boundaries.
+4. Run checks before opening a PR:
+
+```bash
+bun run format:check
+bun run lint
+bun run typecheck
+bun run test
+bun run test:e2e   # needs Postgres (`bun run db:up`)
+```
+
+5. Open a PR against `main` with a short summary of **why** and how you verified it.
+
+Please do not commit secrets, real `.env` files, or unrelated refactors in the same PR.
+
+---
+
 ## Status
 
-| Phase | Scope                           | State       |
-| ----- | ------------------------------- | ----------- |
-| 0–1   | Scaffold, DB foundations        | Done        |
-| 2–4   | Auth, lists/tasks, WebSocket    | Done        |
-| 5–7   | Nuxt auth, UI, realtime client  | Done        |
-| 8     | Unit + e2e + isolation          | Done        |
-| 9     | Docker, Compose, CI cache, docs | Done        |
-| 10    | Full verification / smoke       | In progress |
+| Phase | Scope                           | State |
+| ----- | ------------------------------- | ----- |
+| 0–1   | Scaffold, DB foundations        | Done  |
+| 2–4   | Auth, lists/tasks, WebSocket    | Done  |
+| 5–7   | Nuxt auth, UI, realtime client  | Done  |
+| 8     | Unit + e2e + isolation          | Done  |
+| 9     | Docker, Compose, CI cache, docs | Done  |
+| 10    | Full verification / smoke       | Done  |
 
 Roadmap checklist: [PLAN.md](./PLAN.md).
 

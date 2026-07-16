@@ -19,7 +19,7 @@ function createExpiredAccessError(): FetchError {
 }
 
 describe('shouldRefreshAndRetry', () => {
-  it('returns true for AUTH_ACCESS_TOKEN_EXPIRED when refresh is allowed', () => {
+  it('gates transparent client retry on AUTH_ACCESS_TOKEN_EXPIRED', () => {
     expect(
       shouldRefreshAndRetry({
         skipAuthRefresh: false,
@@ -28,7 +28,7 @@ describe('shouldRefreshAndRetry', () => {
     ).toBe(true);
   });
 
-  it('returns false when skipAuthRefresh is true', () => {
+  it('skips retry when skipAuthRefresh is true', () => {
     expect(
       shouldRefreshAndRetry({
         skipAuthRefresh: true,
@@ -37,7 +37,7 @@ describe('shouldRefreshAndRetry', () => {
     ).toBe(false);
   });
 
-  it('returns false for other errors', () => {
+  it('does not retry on non-expired auth failures', () => {
     expect(
       shouldRefreshAndRetry({
         skipAuthRefresh: false,
