@@ -43,6 +43,17 @@ watch(
 
 const isCompleted = computed(() => tasksStore.selectedTask?.status === TaskStatus.COMPLETED);
 
+function formatDateTime(value: string): string {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) {
+    return value;
+  }
+  return new Intl.DateTimeFormat(undefined, {
+    dateStyle: 'medium',
+    timeStyle: 'short',
+  }).format(date);
+}
+
 async function onSave(): Promise<void> {
   const task = tasksStore.selectedTask;
   if (!task) {
@@ -116,6 +127,25 @@ function onDelete(): void {
       <p v-if="formError" class="lh-alert-error" role="alert">
         {{ formError }}
       </p>
+
+      <dl class="lh-panel-muted grid gap-2 p-3 text-sm">
+        <div class="flex items-baseline justify-between gap-3">
+          <dt class="text-lh-muted">{{ LISTS_TASKS_UI_MESSAGES.statusLabel }}</dt>
+          <dd class="font-semibold text-lh-ink">
+            {{
+              isCompleted
+                ? LISTS_TASKS_UI_MESSAGES.statusCompleted
+                : LISTS_TASKS_UI_MESSAGES.statusActive
+            }}
+          </dd>
+        </div>
+        <div class="flex items-baseline justify-between gap-3">
+          <dt class="text-lh-muted">{{ LISTS_TASKS_UI_MESSAGES.createdAtLabel }}</dt>
+          <dd class="font-medium text-lh-ink">
+            {{ formatDateTime(tasksStore.selectedTask.createdAt) }}
+          </dd>
+        </div>
+      </dl>
 
       <form class="space-y-3" novalidate @submit.prevent="onSave">
         <AuthTextField

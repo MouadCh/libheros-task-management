@@ -161,6 +161,25 @@ flowchart LR
   Api --> Db
 ```
 
+### Why Nuxt (vs a plain Vue SPA)
+
+- **Routing & middleware** — authenticated/guest route guards are first-class (`middleware/auth`, `middleware/guest`) without reinventing a router shell.
+- **Tooling cohesion** — Nuxt’s Vite setup, auto-imports, and Tailwind module keep the front end small for a tech-test delivery while remaining production-familiar.
+- **SSR-capable baseline** — we treat auth as client-bootstrapped today (refresh cookie → memory access token), but Nuxt leaves a path for progressive enhancement later without a rewrite.
+
+### Why Pinia
+
+- **Shared task/list/auth state** — WebSocket handlers and HTTP mutations update one store; components stay presentational.
+- **Composition API native** — same mental model as Nuxt 3 scripts; easier to unit-test stores with Bun.
+- **Avoid prop drilling** — three-column workspace needs selected list/task and user session in header, sidebars, and forms.
+
+### How WebSocket is structured
+
+1. Nest `RealtimeGateway` authenticates JWT at Socket.IO handshake (`auth.token`).
+2. Clients join/leave rooms `list:{listId}` after ownership checks.
+3. List/task services persist first, then `RealtimePublisher` emits typed events (`task:*`, `list:*`).
+4. Nuxt `realtime` plugin keeps one client socket; Pinia applies payloads **without** HTTP re-fetch (reconnect may silently refetch tasks once for consistency).
+
 **Realtime model**
 
 - Rooms are scoped per list: `list:{listId}`.
@@ -245,12 +264,12 @@ Defined in `@libheros/contracts`.
 
 Interactive docs: [Swagger UI](http://localhost:3001/api/docs) (when the API is running).
 
-| Group  | Methods (prefix `/api`)                                                 |
-| ------ | ----------------------------------------------------------------------- |
-| Health | `GET /health`                                                           |
-| Auth   | `POST /auth/register`, `/login`, `/refresh`, `/logout` · `GET /auth/me` |
-| Lists  | `GET                                                                    | POST /lists`·`DELETE /lists/:listId`·`GET | POST /lists/:listId/tasks`                           |
-| Tasks  | `GET                                                                    | PATCH                                     | DELETE /tasks/:taskId`·`PATCH /tasks/:taskId/status` |
+| Group  | Methods (prefix `/api`)                                                               |
+| ------ | ------------------------------------------------------------------------------------- |
+| Health | `GET /health`                                                                         |
+| Auth   | `POST /auth/register`, `/login`, `/refresh`, `/logout` · `GET /auth/me`               |
+| Lists  | `GET` / `POST /lists` · `DELETE /lists/:listId` · `GET` / `POST /lists/:listId/tasks` |
+| Tasks  | `GET` / `PATCH` / `DELETE /tasks/:taskId` · `PATCH /tasks/:taskId/status`             |
 
 ---
 
@@ -270,6 +289,13 @@ Prefer **URL-safe** characters in `POSTGRES_PASSWORD` when Compose builds `DATAB
 ---
 
 ## Scripts
+
+Test commands (Bun workspaces; equivalent to the brief’s `npm run test` / `npm run test:e2e`):
+
+```bash
+bun run test
+bun run test:e2e
+```
 
 | Command                           | Description                         |
 | --------------------------------- | ----------------------------------- |
@@ -328,19 +354,32 @@ bun run ci
 - Strict prod secret gating / rotation; TLS + `COOKIE_SECURE=true`
 - Broader frontend unit & e2e coverage
 - Frozen lockfile for Docker production dependency stage
+- Atomic refresh rotation in the DB (compare-and-swap) under concurrent API replicas
+
+### Testing priorities with more time
+
+1. **Auth e2e** — refresh-token reuse after rotation; expired access JWT → `AUTH_ACCESS_TOKEN_EXPIRED` + client retry
+2. **ListsService unit tests** — normalize/conflict/delete + emit order
+3. **Web** — lists store + Playwright smoke (login → list → task → complete → multi-tab sync)
+4. **Validation negatives** — empty names, bad due dates, throttle responses
+5. **Docker CI job** — `compose config` + image build on PR
+
+### Git history note
+
+Delivery was iterated as **sequential phase commits on `main`** (scaffold → auth → lists → WS → Nuxt → tests → Docker) for reviewability in this tech test. Going forward, prefer `feature/*` / `fix/*` branches per the brief; new work should use short-lived branches + PRs.
 
 ---
 
 ## Status
 
-| Phase | Scope                           | State   |
-| ----- | ------------------------------- | ------- |
-| 0–1   | Scaffold, DB foundations        | Done    |
-| 2–4   | Auth, lists/tasks, WebSocket    | Done    |
-| 5–7   | Nuxt auth, UI, realtime client  | Done    |
-| 8     | Unit + e2e + isolation          | Done    |
-| 9     | Docker, Compose, CI cache, docs | Done    |
-| 10    | Full verification / smoke       | Planned |
+| Phase | Scope                           | State       |
+| ----- | ------------------------------- | ----------- |
+| 0–1   | Scaffold, DB foundations        | Done        |
+| 2–4   | Auth, lists/tasks, WebSocket    | Done        |
+| 5–7   | Nuxt auth, UI, realtime client  | Done        |
+| 8     | Unit + e2e + isolation          | Done        |
+| 9     | Docker, Compose, CI cache, docs | Done        |
+| 10    | Full verification / smoke       | In progress |
 
 Roadmap checklist: [PLAN.md](./PLAN.md).
 

@@ -35,9 +35,10 @@ async function onLogout(): Promise<void> {
         <button
           v-if="showListToggle"
           type="button"
-          class="lh-btn-ghost px-2.5 py-1.5 md:hidden"
+          class="lh-btn-ghost px-2.5 py-1.5"
           :aria-expanded="listsOpen"
           aria-controls="lists-panel"
+          :aria-label="listsOpen ? 'Hide lists sidebar' : 'Show lists sidebar'"
           @click="emit('toggle-lists')"
         >
           Lists

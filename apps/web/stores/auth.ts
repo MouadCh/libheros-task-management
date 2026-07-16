@@ -5,7 +5,7 @@ import { navigateTo } from 'nuxt/app';
 import { useApiClient } from '../composables/useApiClient';
 import { useRealtime } from '../composables/useRealtime';
 import { AppRoutes } from '../constants/api.routes';
-import { isUnauthorizedAuthFailure } from '../utils/auth-errors';
+import { isTransportFailure, isUnauthorizedAuthFailure } from '../utils/auth-errors';
 import {
   accessToken,
   clearSession as clearAuthSession,
@@ -15,18 +15,28 @@ import {
   setUser,
   user,
 } from '../utils/auth-session';
+import {
+  broadcastAccessToken,
+  runExclusiveRefresh,
+  subscribeAccessTokenBroadcast,
+} from '../utils/refresh-coordinator';
 
 type AuthStatus = 'idle' | 'bootstrapping' | 'ready' | 'error';
 
 export const useAuthStore = defineStore('auth', () => {
   const status = ref<AuthStatus>('idle');
   const bootstrapPromise = ref<Promise<void> | null>(null);
-  const refreshPromise = ref<Promise<string> | null>(null);
   const bootstrapGeneration = ref(0);
 
   const isAuthenticated = computed(() => Boolean(accessToken.value && user.value));
   const isReady = computed(() => status.value === 'ready');
   const hasBootstrapError = computed(() => status.value === 'error');
+
+  if (import.meta.client) {
+    subscribeAccessTokenBroadcast((token) => {
+      setAccessToken(token);
+    });
+  }
 
   function invalidateBootstrap(): void {
     bootstrapGeneration.value += 1;
@@ -36,6 +46,7 @@ export const useAuthStore = defineStore('auth', () => {
     invalidateBootstrap();
     setAuthSession(token, nextUser);
     status.value = 'ready';
+    broadcastAccessToken(token);
   }
 
   function clearSessionLocal(): void {
@@ -54,6 +65,15 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
+  /** HTTP refresh only — single-flight + cross-tab lock; does not mutate session. */
+  async function fetchRotatedAccessToken(): Promise<string> {
+    return runExclusiveRefresh(async () => {
+      const api = useApiClient();
+      const response = await api.refresh();
+      return response.accessToken;
+    });
+  }
+
   async function bootstrap(): Promise<void> {
     if (status.value === 'ready') {
       return;
@@ -69,17 +89,18 @@ export const useAuthStore = defineStore('auth', () => {
 
     bootstrapPromise.value = (async () => {
       try {
-        const api = useApiClient();
-        const refreshResponse = await api.refresh();
+        const rotatedToken = await fetchRotatedAccessToken();
 
         if (generation !== bootstrapGeneration.value) {
           return;
         }
 
-        setAccessToken(refreshResponse.accessToken);
+        setAccessToken(rotatedToken);
+        broadcastAccessToken(rotatedToken);
 
         try {
           // skipAuthRefresh avoids nested refreshSession while this flight owns state.
+          const api = useApiClient();
           const profile = await api.me({ skipAuthRefresh: true });
 
           if (generation !== bootstrapGeneration.value) {
@@ -185,32 +206,28 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   async function refreshSession(): Promise<string> {
-    if (refreshPromise.value) {
-      return refreshPromise.value;
-    }
+    try {
+      const rotatedToken = await fetchRotatedAccessToken();
+      setAccessToken(rotatedToken);
+      broadcastAccessToken(rotatedToken);
 
-    refreshPromise.value = (async () => {
-      try {
+      if (!user.value) {
+        // Must not re-enter refreshSession via apiFetch refresh-on-401.
         const api = useApiClient();
-        const response = await api.refresh();
-        setAccessToken(response.accessToken);
-
-        if (!user.value) {
-          // Must not re-enter refreshSession via apiFetch refresh-on-401.
-          setUser(await api.me({ skipAuthRefresh: true }));
-        }
-
-        status.value = 'ready';
-        return response.accessToken;
-      } catch (error) {
-        await clearSessionAndRedirectToLogin();
-        throw error;
-      } finally {
-        refreshPromise.value = null;
+        setUser(await api.me({ skipAuthRefresh: true }));
       }
-    })();
 
-    return refreshPromise.value;
+      status.value = 'ready';
+      return rotatedToken;
+    } catch (error) {
+      // Transient network/5xx: keep current session and let the caller retry.
+      if (isTransportFailure(error) && accessToken.value && user.value) {
+        throw error;
+      }
+
+      await clearSessionAndRedirectToLogin();
+      throw error;
+    }
   }
 
   registerAuthRefreshHandler(refreshSession);

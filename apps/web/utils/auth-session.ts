@@ -5,10 +5,9 @@ import type { UserDto } from '@libheros/contracts';
  * Shared auth session state used by the Pinia store and the API client.
  * Keeps the client from importing the store (avoids a circular dependency).
  *
- * Multi-tab note: refresh tokens rotate server-side (single-use). Concurrent
- * refresh/bootstrap across tabs can revoke one tab's cookie. Coordinate via
- * BroadcastChannel if multi-tab auth UX becomes critical. List/task sync across
- * tabs uses Socket.IO rooms (each tab connects independently) — not this module.
+ * Refresh rotation is single-flight + Web Locks / BroadcastChannel (see
+ * `refresh-coordinator.ts`) so tabs share one refresh and sync access tokens.
+ * List/task sync across tabs uses Socket.IO rooms — not this module.
  */
 export const accessToken: Ref<string | null> = ref(null);
 export const user: Ref<UserDto | null> = ref(null);

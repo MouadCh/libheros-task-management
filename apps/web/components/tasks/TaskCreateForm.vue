@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { TASK_FIELD_LIMITS } from '~/constants/lists-tasks.constants';
 import { useTasksStore } from '~/stores/tasks';
-import { toIsoDueDate } from '~/utils/due-date';
+import { defaultDueDateLocalValue, toIsoDueDate } from '~/utils/due-date';
 import type { FieldErrors } from '~/utils/lists-tasks-validation';
 import { validateCreateTaskPayload } from '~/utils/lists-tasks-validation';
 
@@ -10,7 +10,7 @@ const tasksStore = useTasksStore();
 const form = reactive({
   shortDescription: '',
   longDescription: '',
-  dueDate: '',
+  dueDate: defaultDueDateLocalValue(),
 });
 
 const fieldErrors = ref<FieldErrors>({});
@@ -37,7 +37,7 @@ async function onSubmit(): Promise<void> {
     });
     form.shortDescription = '';
     form.longDescription = '';
-    form.dueDate = '';
+    form.dueDate = defaultDueDateLocalValue();
     fieldErrors.value = {};
   } catch {
     // Store surfaces error.

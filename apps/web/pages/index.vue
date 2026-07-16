@@ -19,6 +19,29 @@ const confirmTitle = ref('');
 const confirmMessage = ref('');
 const pendingAction = ref<null | (() => Promise<void>)>(null);
 
+function isMdUp(): boolean {
+  if (!import.meta.client) {
+    return false;
+  }
+  return window.matchMedia('(min-width: 768px)').matches;
+}
+
+function isLgUp(): boolean {
+  if (!import.meta.client) {
+    return false;
+  }
+  return window.matchMedia('(min-width: 1024px)').matches;
+}
+
+function syncBodyScrollLock(): void {
+  if (!import.meta.client) {
+    return;
+  }
+  const lockLists = listsOpen.value && !isMdUp();
+  const lockDetail = detailOpen.value && !isLgUp();
+  document.body.classList.toggle('overflow-hidden', lockLists || lockDetail);
+}
+
 watch(
   () => listsStore.selectedListId,
   async (listId) => {
@@ -44,11 +67,8 @@ watch(
   },
 );
 
-watch([listsOpen, detailOpen], ([lists, detail]) => {
-  if (!import.meta.client) {
-    return;
-  }
-  document.body.classList.toggle('overflow-hidden', lists || detail);
+watch([listsOpen, detailOpen], () => {
+  syncBodyScrollLock();
 });
 
 onBeforeUnmount(() => {
@@ -58,6 +78,11 @@ onBeforeUnmount(() => {
 });
 
 onMounted(async () => {
+  // Desktop starts with the bandeau open; mobile starts collapsed (drawer).
+  if (isMdUp()) {
+    listsOpen.value = true;
+  }
+
   try {
     await listsStore.fetchLists();
   } catch {
@@ -125,6 +150,13 @@ function closeListsDrawer(): void {
   listsOpen.value = false;
 }
 
+function onListSelected(): void {
+  // Keep the bandeau open on desktop; close the mobile drawer after pick.
+  if (!isMdUp()) {
+    closeListsDrawer();
+  }
+}
+
 function closeDetailDrawer(): void {
   detailOpen.value = false;
 }
@@ -165,22 +197,27 @@ function onKeydown(event: KeyboardEvent): void {
         @click="closeListsDrawer"
       />
 
-      <!-- Single lists panel: drawer on mobile, column on md+ -->
+      <!-- Retractable lists bandeau: drawer on mobile, collapsible column on md+ -->
       <aside
         id="lists-panel"
-        class="fixed inset-y-0 left-0 z-40 flex w-72 max-w-[85vw] flex-col border-r border-lh-line/80 bg-white/95 p-4 shadow-lh backdrop-blur-md transition-transform md:static md:z-0 md:my-3 md:w-64 md:max-w-none md:translate-x-0 md:shrink-0 md:rounded-2xl md:border md:shadow-lh-sm"
-        :class="listsOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'"
-        :role="listsOpen ? 'dialog' : undefined"
-        :aria-modal="listsOpen ? 'true' : undefined"
+        class="fixed inset-y-0 left-0 z-40 flex max-w-[85vw] flex-col border-r border-lh-line/80 bg-white/95 shadow-lh backdrop-blur-md transition-[transform,width,opacity,padding,margin] duration-200 ease-out md:static md:z-0 md:shrink-0 md:rounded-2xl md:border md:shadow-lh-sm"
+        :class="
+          listsOpen
+            ? 'w-72 translate-x-0 p-4 md:my-3 md:w-64 md:opacity-100'
+            : 'pointer-events-none w-72 -translate-x-full p-4 opacity-100 md:my-0 md:w-0 md:overflow-hidden md:border-0 md:p-0 md:opacity-0 md:shadow-none'
+        "
+        :aria-hidden="listsOpen ? undefined : 'true'"
+        :role="listsOpen && !isMdUp() ? 'dialog' : undefined"
+        :aria-modal="listsOpen && !isMdUp() ? 'true' : undefined"
         aria-label="Task lists"
       >
-        <div class="mb-3 flex items-center justify-between md:hidden">
+        <div class="mb-3 flex items-center justify-between">
           <p class="font-display text-sm font-semibold text-lh-ink">Lists</p>
           <button type="button" class="lh-btn-ghost px-2 py-1" @click="closeListsDrawer">
             Close
           </button>
         </div>
-        <TasksListsSidebar :request-delete="requestDeleteList" @selected="closeListsDrawer" />
+        <TasksListsSidebar :request-delete="requestDeleteList" @selected="onListSelected" />
       </aside>
 
       <main
@@ -229,10 +266,12 @@ function onKeydown(event: KeyboardEvent): void {
             />
 
             <TasksTaskListSection
-              title="Completed"
+              :title="LISTS_TASKS_UI_MESSAGES.completedSectionTitle"
               :empty-message="LISTS_TASKS_UI_MESSAGES.noCompletedTasks"
               :tasks="tasksStore.completedTasks"
               :selected-task-id="tasksStore.selectedTaskId"
+              collapsible
+              :default-expanded="false"
               @select="onSelectTask"
               @toggle-complete="onToggleComplete"
             />

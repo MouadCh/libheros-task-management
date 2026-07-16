@@ -87,8 +87,9 @@ function onTabKeydown(event: KeyboardEvent): void {
             href="https://www.libheros.fr/"
             target="_blank"
             rel="noopener noreferrer"
-            >libheros</a
           >
+            libheros
+          </a>
           brings care closer to people.
         </p>
       </section>

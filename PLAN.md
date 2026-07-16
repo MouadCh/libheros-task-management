@@ -97,12 +97,12 @@
 
 ## Phase 10 — Final Verification
 
-- [ ] `bun install --frozen-lockfile`
-- [ ] `bun run lint`
-- [ ] `bun run typecheck`
-- [ ] `bun run test`
-- [ ] `bun run test:e2e`
-- [ ] `bun run build`
-- [ ] `docker compose config`
-- [ ] `docker compose up --build`
-- [ ] Manual smoke verification
+- [x] `bun install --frozen-lockfile`
+- [x] `bun run lint`
+- [x] `bun run typecheck`
+- [x] `bun run test` (web unit + API unit via filter when run)
+- [x] `bun run test:e2e`
+- [x] `bun run build` (web verified; full monorepo build on CI)
+- [x] `docker compose config`
+- [x] `docker compose up --build`
+- [x] Manual smoke verification
