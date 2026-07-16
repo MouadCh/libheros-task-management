@@ -43,7 +43,7 @@ async function onSubmit(): Promise<void> {
 
 <template>
   <form class="space-y-4" novalidate @submit.prevent="onSubmit">
-    <p v-if="formError" class="rounded-md bg-rose-50 px-3 py-2 text-sm text-rose-700" role="alert">
+    <p v-if="formError" class="lh-alert-error" role="alert">
       {{ formError }}
     </p>
 
@@ -73,7 +73,7 @@ async function onSubmit(): Promise<void> {
 
     <button
       type="submit"
-      class="inline-flex w-full items-center justify-center rounded-md bg-slate-900 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-slate-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-900 disabled:cursor-not-allowed disabled:opacity-60"
+      class="lh-btn-primary w-full"
       :disabled="isSubmitting"
       :aria-busy="isSubmitting"
     >

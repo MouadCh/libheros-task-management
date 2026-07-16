@@ -18,8 +18,8 @@ const heading = computed(() =>
 
 const description = computed(() =>
   mode.value === AUTH_UI_MODE.login
-    ? 'Use your email and password to access your task lists.'
-    : 'Register to start organizing and synchronizing your tasks.',
+    ? 'Access your lists and stay in sync across devices.'
+    : 'Join in a minute and start organizing what matters.',
 );
 
 function selectMode(next: AuthUiMode): void {
@@ -53,69 +53,109 @@ function onTabKeydown(event: KeyboardEvent): void {
 </script>
 
 <template>
-  <main class="flex min-h-screen items-center justify-center bg-slate-50 p-6">
-    <div class="w-full max-w-md rounded-xl bg-white p-8 shadow-sm ring-1 ring-slate-200">
-      <div class="mb-6">
-        <p class="text-sm font-medium uppercase tracking-wide text-slate-500">Libheros</p>
-        <h1 class="mt-1 text-2xl font-semibold text-slate-900">{{ heading }}</h1>
-        <p class="mt-2 text-sm text-slate-600">{{ description }}</p>
-      </div>
+  <main
+    class="relative flex min-h-screen items-center justify-center overflow-hidden px-4 py-10 sm:px-6"
+  >
+    <div
+      class="pointer-events-none absolute -left-24 top-10 h-72 w-72 rounded-full bg-lh-teal/20 blur-3xl"
+      aria-hidden="true"
+    />
+    <div
+      class="pointer-events-none absolute -right-16 bottom-0 h-80 w-80 rounded-full bg-lh-coral/15 blur-3xl"
+      aria-hidden="true"
+    />
 
-      <AuthSessionErrorBanner />
-
-      <div
-        class="mb-6 grid grid-cols-2 gap-1 rounded-lg bg-slate-100 p-1"
-        role="tablist"
-        aria-label="Authentication mode"
-        @keydown="onTabKeydown"
-      >
-        <button
-          :id="loginTabId"
-          type="button"
-          role="tab"
-          class="rounded-md px-3 py-2 text-sm font-medium transition"
-          :class="
-            mode === AUTH_UI_MODE.login
-              ? 'bg-white text-slate-900 shadow-sm'
-              : 'text-slate-600 hover:text-slate-900'
-          "
-          :aria-selected="mode === AUTH_UI_MODE.login"
-          :aria-controls="loginPanelId"
-          :tabindex="mode === AUTH_UI_MODE.login ? 0 : -1"
-          @click="selectMode(AUTH_UI_MODE.login)"
+    <div class="relative grid w-full max-w-5xl gap-8 lg:grid-cols-[1.05fr_0.95fr] lg:items-center">
+      <section class="lh-fade-in px-2 text-center lg:px-4 lg:text-left">
+        <div class="mb-5 inline-flex items-center gap-3">
+          <span class="lh-brand-mark" aria-hidden="true">lh</span>
+          <p class="lh-brand">libheros</p>
+        </div>
+        <h1
+          class="font-display text-4xl font-semibold leading-[1.1] tracking-tight text-lh-ink sm:text-5xl"
         >
-          Sign in
-        </button>
-        <button
-          :id="registerTabId"
-          type="button"
-          role="tab"
-          class="rounded-md px-3 py-2 text-sm font-medium transition"
-          :class="
-            mode === AUTH_UI_MODE.register
-              ? 'bg-white text-slate-900 shadow-sm'
-              : 'text-slate-600 hover:text-slate-900'
-          "
-          :aria-selected="mode === AUTH_UI_MODE.register"
-          :aria-controls="registerPanelId"
-          :tabindex="mode === AUTH_UI_MODE.register ? 0 : -1"
-          @click="selectMode(AUTH_UI_MODE.register)"
-        >
-          Register
-        </button>
-      </div>
+          Tasks,
+          <span class="bg-gradient-to-r from-lh-teal to-lh-teal-deep bg-clip-text text-transparent">
+            closer
+          </span>
+          to your day.
+        </h1>
+        <p class="mx-auto mt-4 max-w-md text-base leading-relaxed text-lh-muted lg:mx-0">
+          A calm workspace for lists and realtime sync — inspired by how
+          <a
+            class="font-semibold text-lh-teal-deep underline decoration-lh-teal/30 underline-offset-4 transition hover:decoration-lh-teal"
+            href="https://www.libheros.fr/"
+            target="_blank"
+            rel="noopener noreferrer"
+            >libheros</a
+          >
+          brings care closer to people.
+        </p>
+      </section>
 
-      <div
-        v-if="mode === AUTH_UI_MODE.login"
-        :id="loginPanelId"
-        role="tabpanel"
-        :aria-labelledby="loginTabId"
-      >
-        <AuthLoginForm />
-      </div>
-      <div v-else :id="registerPanelId" role="tabpanel" :aria-labelledby="registerTabId">
-        <AuthRegisterForm />
-      </div>
+      <section class="lh-panel lh-fade-in-delay p-6 sm:p-8">
+        <p class="lh-kicker">Welcome</p>
+        <h2 class="mt-2 font-display text-2xl font-semibold text-lh-ink">{{ heading }}</h2>
+        <p class="mt-2 text-sm text-lh-muted">{{ description }}</p>
+
+        <div class="mt-6">
+          <AuthSessionErrorBanner />
+        </div>
+
+        <div
+          class="mb-6 grid grid-cols-2 gap-1 rounded-xl bg-lh-surface-2 p-1"
+          role="tablist"
+          aria-label="Authentication mode"
+          @keydown="onTabKeydown"
+        >
+          <button
+            :id="loginTabId"
+            type="button"
+            role="tab"
+            class="rounded-lg px-3 py-2.5 text-sm font-semibold transition"
+            :class="
+              mode === AUTH_UI_MODE.login
+                ? 'bg-white text-lh-ink shadow-lh-sm'
+                : 'text-lh-muted hover:text-lh-ink'
+            "
+            :aria-selected="mode === AUTH_UI_MODE.login"
+            :aria-controls="loginPanelId"
+            :tabindex="mode === AUTH_UI_MODE.login ? 0 : -1"
+            @click="selectMode(AUTH_UI_MODE.login)"
+          >
+            Sign in
+          </button>
+          <button
+            :id="registerTabId"
+            type="button"
+            role="tab"
+            class="rounded-lg px-3 py-2.5 text-sm font-semibold transition"
+            :class="
+              mode === AUTH_UI_MODE.register
+                ? 'bg-white text-lh-ink shadow-lh-sm'
+                : 'text-lh-muted hover:text-lh-ink'
+            "
+            :aria-selected="mode === AUTH_UI_MODE.register"
+            :aria-controls="registerPanelId"
+            :tabindex="mode === AUTH_UI_MODE.register ? 0 : -1"
+            @click="selectMode(AUTH_UI_MODE.register)"
+          >
+            Register
+          </button>
+        </div>
+
+        <div
+          v-if="mode === AUTH_UI_MODE.login"
+          :id="loginPanelId"
+          role="tabpanel"
+          :aria-labelledby="loginTabId"
+        >
+          <AuthLoginForm />
+        </div>
+        <div v-else :id="registerPanelId" role="tabpanel" :aria-labelledby="registerTabId">
+          <AuthRegisterForm />
+        </div>
+      </section>
     </div>
   </main>
 </template>

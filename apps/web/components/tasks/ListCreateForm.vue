@@ -30,7 +30,7 @@ async function onSubmit(): Promise<void> {
 </script>
 
 <template>
-  <form class="space-y-2" novalidate @submit.prevent="onSubmit">
+  <form class="lh-panel-muted space-y-2 p-3" novalidate @submit.prevent="onSubmit">
     <AuthTextField
       id="new-list-name"
       v-model="name"
@@ -42,12 +42,14 @@ async function onSubmit(): Promise<void> {
     />
     <button
       type="submit"
-      class="w-full rounded-md bg-slate-900 px-3 py-2 text-sm font-medium text-white hover:bg-slate-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-900 disabled:opacity-60"
+      class="lh-btn-accent w-full"
       :disabled="isSubmitting || listsStore.isMutating"
       :aria-busy="isSubmitting"
     >
       {{ isSubmitting ? 'Adding…' : 'Add list' }}
     </button>
-    <p class="sr-only">{{ LISTS_TASKS_UI_MESSAGES.listNameRequired }}</p>
+    <p v-if="fieldErrors.name" class="sr-only">
+      {{ LISTS_TASKS_UI_MESSAGES.listNameRequired }}
+    </p>
   </form>
 </template>

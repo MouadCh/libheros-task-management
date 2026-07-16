@@ -42,15 +42,11 @@ async function onRetry(): Promise<void> {
 </script>
 
 <template>
-  <div
-    v-if="showSessionError"
-    class="mb-6 rounded-md border border-amber-200 bg-amber-50 px-3 py-3 text-sm text-amber-900"
-    role="alert"
-  >
+  <div v-if="showSessionError" class="lh-alert-warn mb-6" role="alert">
     <p>{{ AUTH_SESSION_ERROR_MESSAGE }}</p>
     <button
       type="button"
-      class="mt-3 inline-flex items-center justify-center rounded-md border border-amber-300 bg-white px-3 py-1.5 text-sm font-medium text-amber-950 transition hover:bg-amber-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-800 disabled:opacity-60"
+      class="lh-btn-ghost mt-3"
       :disabled="isRetrying"
       :aria-busy="isRetrying"
       @click="onRetry"

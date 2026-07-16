@@ -1,3 +1,132 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+:root {
+  --lh-ink: 22 35 46;
+  --lh-muted: 92 107 120;
+  --lh-line: 215 229 227;
+  --lh-surface: 243 250 248;
+  --lh-surface-2: 232 246 243;
+  --lh-white: 255 255 255;
+  --lh-teal: 15 158 152;
+  --lh-teal-deep: 10 127 122;
+  --lh-teal-soft: 212 243 239;
+  --lh-coral: 255 93 122;
+  --lh-coral-deep: 232 72 102;
+  --lh-rose-soft: 255 240 243;
+  --lh-amber-soft: 255 247 232;
+  --lh-amber: 180 83 9;
+  --lh-danger: 190 18 60;
+  --lh-radius: 0.875rem;
+  --lh-shadow: 0 18px 50px -28px rgb(15 60 58 / 0.35);
+  --lh-shadow-sm: 0 8px 24px -16px rgb(15 60 58 / 0.28);
+}
+
+@layer base {
+  html {
+    @apply antialiased;
+  }
+
+  body {
+    @apply bg-lh-surface font-sans text-lh-ink;
+    background-image:
+      radial-gradient(ellipse 80% 50% at 0% -10%, rgb(15 158 152 / 0.14), transparent 55%),
+      radial-gradient(ellipse 60% 40% at 100% 0%, rgb(255 93 122 / 0.08), transparent 50%),
+      linear-gradient(180deg, #f7fcfb 0%, rgb(var(--lh-surface)) 40%, #eef7f5 100%);
+    background-attachment: fixed;
+    min-height: 100%;
+  }
+
+  ::selection {
+    background: rgb(15 158 152 / 0.22);
+  }
+}
+
+@layer components {
+  .lh-brand {
+    @apply font-display text-[1.65rem] font-semibold tracking-tight text-lh-ink;
+  }
+
+  .lh-brand-mark {
+    @apply inline-flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-lh-teal to-lh-teal-deep text-sm font-bold text-white shadow-sm;
+  }
+
+  .lh-kicker {
+    @apply font-display text-xs font-semibold uppercase tracking-[0.18em] text-lh-teal-deep;
+  }
+
+  .lh-panel {
+    @apply rounded-[var(--lh-radius)] border border-lh-line/80 bg-lh-white/90 shadow-[var(--lh-shadow-sm)] backdrop-blur-sm;
+  }
+
+  .lh-panel-muted {
+    @apply rounded-[var(--lh-radius)] border border-lh-line/70 bg-white/70;
+  }
+
+  .lh-input {
+    @apply w-full rounded-xl border border-lh-line bg-white px-3.5 py-2.5 text-lh-ink shadow-sm outline-none transition placeholder:text-lh-muted/70 focus:border-lh-teal focus:ring-2 focus:ring-lh-teal/25 disabled:cursor-not-allowed disabled:bg-lh-surface-2;
+  }
+
+  .lh-label {
+    @apply block text-sm font-medium text-lh-ink;
+  }
+
+  .lh-btn {
+    @apply inline-flex items-center justify-center rounded-xl px-4 py-2.5 text-sm font-semibold transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 disabled:cursor-not-allowed disabled:opacity-60;
+  }
+
+  .lh-btn-primary {
+    @apply lh-btn bg-lh-coral text-white shadow-sm hover:bg-lh-coral-deep focus-visible:outline-lh-coral;
+  }
+
+  .lh-btn-accent {
+    @apply lh-btn bg-lh-teal text-white shadow-sm hover:bg-lh-teal-deep focus-visible:outline-lh-teal;
+  }
+
+  .lh-btn-ghost {
+    @apply lh-btn border border-lh-line bg-white text-lh-ink hover:border-lh-teal/40 hover:bg-lh-teal-soft/60 focus-visible:outline-lh-teal;
+  }
+
+  .lh-btn-danger {
+    @apply lh-btn border border-rose-200 bg-lh-rose-soft text-lh-danger hover:bg-rose-100 focus-visible:outline-lh-danger;
+  }
+
+  .lh-btn-danger-solid {
+    @apply lh-btn bg-lh-danger text-white hover:bg-rose-800 focus-visible:outline-lh-danger;
+  }
+
+  .lh-alert-error {
+    @apply rounded-xl border border-rose-200 bg-lh-rose-soft px-3 py-2.5 text-sm text-lh-danger;
+  }
+
+  .lh-alert-warn {
+    @apply rounded-xl border border-amber-200 bg-lh-amber-soft px-3 py-3 text-sm text-lh-amber;
+  }
+
+  .lh-fade-in {
+    animation: lh-fade-up 420ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  .lh-fade-in-delay {
+    animation: lh-fade-up 520ms cubic-bezier(0.22, 1, 0.36, 1) 80ms both;
+  }
+}
+
+@keyframes lh-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lh-fade-in,
+  .lh-fade-in-delay {
+    animation: none;
+  }
+}

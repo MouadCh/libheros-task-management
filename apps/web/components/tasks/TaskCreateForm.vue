@@ -48,12 +48,8 @@ async function onSubmit(): Promise<void> {
 </script>
 
 <template>
-  <form
-    class="space-y-3 rounded-xl border border-slate-200 bg-white p-4"
-    novalidate
-    @submit.prevent="onSubmit"
-  >
-    <h3 class="text-sm font-semibold text-slate-900">Add task</h3>
+  <form class="lh-panel space-y-3 p-4" novalidate @submit.prevent="onSubmit">
+    <h3 class="font-display text-base font-semibold text-lh-ink">Add task</h3>
     <AuthTextField
       id="task-short-description"
       v-model="form.shortDescription"
@@ -83,7 +79,7 @@ async function onSubmit(): Promise<void> {
     />
     <button
       type="submit"
-      class="rounded-md bg-slate-900 px-3 py-2 text-sm font-medium text-white hover:bg-slate-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-900 disabled:opacity-60"
+      class="lh-btn-primary"
       :disabled="isSubmitting || tasksStore.isMutating"
       :aria-busy="isSubmitting"
     >

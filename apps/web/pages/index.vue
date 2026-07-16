@@ -146,7 +146,7 @@ function onKeydown(event: KeyboardEvent): void {
 </script>
 
 <template>
-  <div class="flex min-h-screen flex-col bg-slate-50" @keydown="onKeydown">
+  <div class="flex min-h-screen flex-col" @keydown="onKeydown">
     <TasksAppHeader
       :lists-open="listsOpen"
       :detail-open="detailOpen"
@@ -156,11 +156,11 @@ function onKeydown(event: KeyboardEvent): void {
       @toggle-detail="detailOpen = !detailOpen"
     />
 
-    <div class="relative mx-auto flex w-full max-w-7xl flex-1 overflow-hidden">
+    <div class="relative mx-auto flex w-full max-w-7xl flex-1 overflow-hidden px-0 md:px-3 md:pb-4">
       <!-- Mobile lists backdrop -->
       <div
         v-if="listsOpen"
-        class="fixed inset-0 z-30 bg-slate-900/40 md:hidden"
+        class="fixed inset-0 z-30 bg-lh-ink/35 backdrop-blur-[2px] md:hidden"
         aria-hidden="true"
         @click="closeListsDrawer"
       />
@@ -168,49 +168,55 @@ function onKeydown(event: KeyboardEvent): void {
       <!-- Single lists panel: drawer on mobile, column on md+ -->
       <aside
         id="lists-panel"
-        class="fixed inset-y-0 left-0 z-40 flex w-72 max-w-[85vw] flex-col border-r border-slate-200 bg-white p-4 transition-transform md:static md:z-0 md:w-60 md:max-w-none md:translate-x-0 md:shrink-0"
+        class="fixed inset-y-0 left-0 z-40 flex w-72 max-w-[85vw] flex-col border-r border-lh-line/80 bg-white/95 p-4 shadow-lh backdrop-blur-md transition-transform md:static md:z-0 md:my-3 md:w-64 md:max-w-none md:translate-x-0 md:shrink-0 md:rounded-2xl md:border md:shadow-lh-sm"
         :class="listsOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'"
         :role="listsOpen ? 'dialog' : undefined"
         :aria-modal="listsOpen ? 'true' : undefined"
         aria-label="Task lists"
       >
         <div class="mb-3 flex items-center justify-between md:hidden">
-          <p class="text-sm font-semibold text-slate-900">Lists</p>
-          <button
-            type="button"
-            class="rounded-md px-2 py-1 text-sm text-slate-600 hover:bg-slate-100"
-            @click="closeListsDrawer"
-          >
+          <p class="font-display text-sm font-semibold text-lh-ink">Lists</p>
+          <button type="button" class="lh-btn-ghost px-2 py-1" @click="closeListsDrawer">
             Close
           </button>
         </div>
         <TasksListsSidebar :request-delete="requestDeleteList" @selected="closeListsDrawer" />
       </aside>
 
-      <main class="min-w-0 flex-1 space-y-6 overflow-y-auto p-4 md:p-6" aria-label="Tasks">
+      <main
+        class="min-w-0 flex-1 space-y-6 overflow-y-auto p-4 md:my-3 md:rounded-2xl md:border md:border-lh-line/70 md:bg-white/70 md:p-6 md:shadow-lh-sm md:backdrop-blur-sm"
+        aria-label="Tasks"
+      >
         <template v-if="!listsStore.selectedListId">
-          <p class="text-sm text-slate-600">{{ LISTS_TASKS_UI_MESSAGES.noListSelected }}</p>
+          <div class="lh-fade-in flex max-w-md flex-col gap-3 py-8">
+            <p class="lh-kicker">Workspace</p>
+            <h1 class="font-display text-3xl font-semibold tracking-tight text-lh-ink">
+              Choose a list to begin
+            </h1>
+            <p class="text-sm leading-relaxed text-lh-muted">
+              {{ LISTS_TASKS_UI_MESSAGES.noListSelected }}
+            </p>
+          </div>
         </template>
 
         <template v-else>
-          <div>
-            <h1 class="text-xl font-semibold text-slate-900">
+          <div class="lh-fade-in">
+            <p class="lh-kicker">Active list</p>
+            <h1 class="mt-1 font-display text-3xl font-semibold tracking-tight text-lh-ink">
               {{ listsStore.selectedList?.name ?? 'Tasks' }}
             </h1>
-            <p class="mt-1 text-sm text-slate-600">Active and completed tasks for this list.</p>
+            <p class="mt-2 text-sm text-lh-muted">
+              Active and completed tasks — updates sync in realtime.
+            </p>
           </div>
 
-          <p
-            v-if="tasksStore.error"
-            class="rounded-md bg-rose-50 px-3 py-2 text-sm text-rose-700"
-            role="alert"
-          >
+          <p v-if="tasksStore.error" class="lh-alert-error" role="alert">
             {{ tasksStore.error }}
           </p>
 
           <TasksTaskCreateForm />
 
-          <p v-if="tasksStore.isLoading" class="text-sm text-slate-500">Loading tasks…</p>
+          <p v-if="tasksStore.isLoading" class="text-sm text-lh-muted">Loading tasks…</p>
 
           <template v-else>
             <TasksTaskListSection
@@ -237,7 +243,7 @@ function onKeydown(event: KeyboardEvent): void {
       <!-- Mobile detail backdrop -->
       <div
         v-if="detailOpen"
-        class="fixed inset-0 z-30 bg-slate-900/40 lg:hidden"
+        class="fixed inset-0 z-30 bg-lh-ink/35 backdrop-blur-[2px] lg:hidden"
         aria-hidden="true"
         @click="closeDetailDrawer"
       />
@@ -245,19 +251,15 @@ function onKeydown(event: KeyboardEvent): void {
       <!-- Single detail panel: drawer below lg, column on lg+ -->
       <aside
         id="task-detail-panel"
-        class="fixed inset-y-0 right-0 z-40 flex w-full max-w-md flex-col border-l border-slate-200 bg-white p-4 transition-transform lg:static lg:z-0 lg:w-80 lg:max-w-none lg:translate-x-0 lg:shrink-0"
+        class="fixed inset-y-0 right-0 z-40 flex w-full max-w-md flex-col border-l border-lh-line/80 bg-white/95 p-4 shadow-lh backdrop-blur-md transition-transform lg:static lg:z-0 lg:my-3 lg:ml-0 lg:w-80 lg:max-w-none lg:translate-x-0 lg:shrink-0 lg:rounded-2xl lg:border lg:shadow-lh-sm"
         :class="detailOpen ? 'translate-x-0' : 'translate-x-full lg:translate-x-0'"
         :role="detailOpen ? 'dialog' : undefined"
         :aria-modal="detailOpen ? 'true' : undefined"
         aria-label="Task details"
       >
         <div class="mb-3 flex items-center justify-between lg:hidden">
-          <p class="text-sm font-semibold text-slate-900">Task details</p>
-          <button
-            type="button"
-            class="rounded-md px-2 py-1 text-sm text-slate-600 hover:bg-slate-100"
-            @click="closeDetailDrawer"
-          >
+          <p class="font-display text-sm font-semibold text-lh-ink">Task details</p>
+          <button type="button" class="lh-btn-ghost px-2 py-1" @click="closeDetailDrawer">
             Close
           </button>
         </div>

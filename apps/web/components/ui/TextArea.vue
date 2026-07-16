@@ -17,9 +17,9 @@ defineEmits<{
 
 <template>
   <div class="space-y-1.5">
-    <label :for="id" class="block text-sm font-medium text-slate-800">
+    <label :for="id" class="lh-label">
       {{ label }}
-      <span v-if="required" class="text-rose-600" aria-hidden="true">*</span>
+      <span v-if="required" class="text-lh-coral" aria-hidden="true">*</span>
     </label>
     <textarea
       :id="id"
@@ -30,10 +30,10 @@ defineEmits<{
       :maxlength="maxlength"
       :aria-invalid="error ? 'true' : 'false'"
       :aria-describedby="error ? `${id}-error` : undefined"
-      class="w-full rounded-md border border-slate-300 px-3 py-2 text-slate-900 shadow-sm outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-200 disabled:cursor-not-allowed disabled:bg-slate-100"
+      class="lh-input resize-y"
       @input="$emit('update:modelValue', ($event.target as HTMLTextAreaElement).value)"
     />
-    <p v-if="error" :id="`${id}-error`" class="text-sm text-rose-600" role="alert">
+    <p v-if="error" :id="`${id}-error`" class="text-sm text-lh-danger" role="alert">
       {{ error }}
     </p>
   </div>

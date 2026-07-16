@@ -28,46 +28,46 @@ async function onLogout(): Promise<void> {
 
 <template>
   <header
-    class="flex items-center justify-between gap-3 border-b border-slate-200 bg-white px-4 py-3"
+    class="sticky top-0 z-20 border-b border-lh-line/80 bg-white/80 px-4 py-3 shadow-lh-sm backdrop-blur-md"
   >
-    <div class="flex min-w-0 items-center gap-2">
-      <button
-        v-if="showListToggle"
-        type="button"
-        class="rounded-md border border-slate-300 bg-white px-2.5 py-1.5 text-sm font-medium text-slate-800 hover:bg-slate-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-900 md:hidden"
-        :aria-expanded="listsOpen"
-        aria-controls="lists-panel"
-        @click="emit('toggle-lists')"
-      >
-        Lists
-      </button>
-      <div class="min-w-0">
-        <p class="truncate text-sm font-semibold text-slate-900">Libheros Tasks</p>
-        <p v-if="authStore.user" class="truncate text-xs text-slate-500">
-          {{ authStore.user.firstName }} {{ authStore.user.lastName }}
-        </p>
+    <div class="mx-auto flex max-w-7xl items-center justify-between gap-3">
+      <div class="flex min-w-0 items-center gap-2.5">
+        <button
+          v-if="showListToggle"
+          type="button"
+          class="lh-btn-ghost px-2.5 py-1.5 md:hidden"
+          :aria-expanded="listsOpen"
+          aria-controls="lists-panel"
+          @click="emit('toggle-lists')"
+        >
+          Lists
+        </button>
+        <span class="lh-brand-mark hidden sm:inline-flex" aria-hidden="true">lh</span>
+        <div class="min-w-0">
+          <p class="truncate font-display text-base font-semibold tracking-tight text-lh-ink">
+            libheros <span class="text-lh-teal">Tasks</span>
+          </p>
+          <p v-if="authStore.user" class="truncate text-xs text-lh-muted">
+            {{ authStore.user.firstName }} {{ authStore.user.lastName }}
+          </p>
+        </div>
       </div>
-    </div>
 
-    <div class="flex items-center gap-2">
-      <button
-        v-if="showDetailToggle"
-        type="button"
-        class="rounded-md border border-slate-300 bg-white px-2.5 py-1.5 text-sm font-medium text-slate-800 hover:bg-slate-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-900 md:hidden"
-        :aria-expanded="detailOpen"
-        aria-controls="task-detail-panel"
-        @click="emit('toggle-detail')"
-      >
-        Detail
-      </button>
-      <button
-        type="button"
-        class="rounded-md border border-slate-300 bg-white px-3 py-1.5 text-sm font-medium text-slate-800 transition hover:bg-slate-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-900 disabled:opacity-60"
-        :disabled="isLoggingOut"
-        @click="onLogout"
-      >
-        {{ isLoggingOut ? 'Signing out…' : 'Sign out' }}
-      </button>
+      <div class="flex items-center gap-2">
+        <button
+          v-if="showDetailToggle"
+          type="button"
+          class="lh-btn-ghost px-2.5 py-1.5 lg:hidden"
+          :aria-expanded="detailOpen"
+          aria-controls="task-detail-panel"
+          @click="emit('toggle-detail')"
+        >
+          Detail
+        </button>
+        <button type="button" class="lh-btn-ghost" :disabled="isLoggingOut" @click="onLogout">
+          {{ isLoggingOut ? 'Signing out…' : 'Sign out' }}
+        </button>
+      </div>
     </div>
   </header>
 </template>

@@ -97,27 +97,23 @@ function onDelete(): void {
 <template>
   <div class="flex h-full flex-col gap-4" aria-label="Task details">
     <template v-if="!tasksStore.selectedTask">
-      <h2 class="text-sm font-semibold uppercase tracking-wide text-slate-500">Details</h2>
-      <p class="text-sm text-slate-600">{{ LISTS_TASKS_UI_MESSAGES.noTaskSelected }}</p>
+      <h2 class="lh-kicker">Details</h2>
+      <p class="text-sm text-lh-muted">{{ LISTS_TASKS_UI_MESSAGES.noTaskSelected }}</p>
     </template>
 
     <template v-else>
       <div class="flex items-start justify-between gap-2">
-        <h2 class="text-sm font-semibold uppercase tracking-wide text-slate-500">Details</h2>
+        <h2 class="lh-kicker">Details</h2>
         <button
           type="button"
-          class="text-sm text-slate-600 hover:text-slate-900 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-900"
+          class="text-sm font-medium text-lh-muted transition hover:text-lh-teal-deep focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-lh-teal"
           @click="tasksStore.clearSelection()"
         >
           Close
         </button>
       </div>
 
-      <p
-        v-if="formError"
-        class="rounded-md bg-rose-50 px-3 py-2 text-sm text-rose-700"
-        role="alert"
-      >
+      <p v-if="formError" class="lh-alert-error" role="alert">
         {{ formError }}
       </p>
 
@@ -152,7 +148,7 @@ function onDelete(): void {
         <div class="flex flex-wrap gap-2">
           <button
             type="submit"
-            class="rounded-md bg-slate-900 px-3 py-2 text-sm font-medium text-white hover:bg-slate-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-900 disabled:opacity-60"
+            class="lh-btn-accent"
             :disabled="isSaving || tasksStore.isMutating"
             :aria-busy="isSaving"
           >
@@ -160,7 +156,7 @@ function onDelete(): void {
           </button>
           <button
             type="button"
-            class="rounded-md border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-800 hover:bg-slate-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-900 disabled:opacity-60"
+            class="lh-btn-ghost"
             :disabled="tasksStore.isMutating"
             :aria-pressed="isCompleted"
             @click="onToggleComplete"
@@ -169,7 +165,7 @@ function onDelete(): void {
           </button>
           <button
             type="button"
-            class="rounded-md border border-rose-200 bg-rose-50 px-3 py-2 text-sm font-medium text-rose-800 hover:bg-rose-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rose-800 disabled:opacity-60"
+            class="lh-btn-danger"
             :disabled="tasksStore.isMutating"
             @click="onDelete"
           >
